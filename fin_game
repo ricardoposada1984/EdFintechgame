@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Súper Cerebro: Finanzas Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .correct-anim { animation: pulse-green 0.6s ease-out; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-slate-900 flex items-center justify-center min-h-screen font-sans p-4">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center w-full max-w-md border-t-8 border-indigo-600" id="main-container">
+        
+        <div id="setup-container">
+            <h1 class="text-4xl font-black mb-2 text-indigo-700 tracking-tight italic">SÚPER CEREBRO</h1>
+            <h2 class="text-xl font-bold mb-6 text-slate-700">💼 Entrevista: Finanzas Pro</h2>
+            <input type="text" id="username" placeholder="Nombre del Candidato" class="w-full p-4 mb-4 border-2 border-slate-200 rounded-xl text-center text-lg outline-none focus:border-indigo-500 transition-all">
+            <div class="grid grid-cols-1 gap-3">
+                <button onclick="startGame(1)" class="bg-emerald-500 hover:bg-emerald-600 text-white p-4 rounded-xl font-bold shadow-lg active:scale-95">Analista Jr (2 min/p) 🟢</button>
+                <button onclick="startGame(2)" class="bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-xl font-bold shadow-lg active:scale-95">Asesor Sr (3 min/p) 🟠</button>
+                <button onclick="startGame(3)" class="bg-rose-500 hover:bg-rose-600 text-white p-4 rounded-xl font-bold shadow-lg active:scale-95">Director (4 min/p) 🔴</button>
+            </div>
+        </div>
+
+        <div id="game-container" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <span id="timer" class="text-xl font-black text-rose-500 bg-rose-50 px-4 py-1 rounded-full border-2 border-rose-200">0s</span>
+                <span id="progress" class="text-sm font-bold text-slate-400 uppercase">P: 1/10</span>
+                <span id="score-display" class="text-xl font-black text-emerald-600">$0</span>
+            </div>
+            
+            <div class="bg-slate-50 p-6 rounded-2xl mb-4 border-2 border-slate-100 min-h-[140px] flex items-center justify-center">
+                <p id="problem-text" class="text-xl font-bold text-slate-800 leading-tight"></p>
+            </div>
+            
+            <div id="feedback" class="h-20 mb-2 text-3xl font-black text-emerald-600 flex items-center justify-center transition-all scale-110"></div>
+
+            <input type="number" id="answer" step="0.01" onkeypress="handleKeyPress(event)" class="w-full p-5 mb-4 border-4 border-indigo-100 rounded-2xl text-center text-4xl font-black focus:border-indigo-500 outline-none" placeholder="0.00">
+            <button id="send-btn" onclick="checkAnswer()" class="w-full bg-indigo-600 text-white p-5 rounded-2xl text-2xl font-black hover:bg-indigo-700 shadow-xl active:scale-95 uppercase">Enviar Balance 📩</button>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let timeLeft = 120;
+        let timerMax = 120;
+        let timerInterval;
+        let currentAnswer;
+        let world = 1;
+        let username = "";
+        let questionsDone = 0;
+        const totalQuestions = 10;
+        const maxPoints = totalQuestions * 100;
+
+        const congrats = [
+            "¡BRUTAL! 💰💎🚀🤑✨", 
+            "¡MENTE DE TIBURÓN! 🦈🔥📈💎", 
+            "¡ERES UN CRACK! 📊🤑✨💰", 
+            "¡NIVEL LEYENDA, CEO! 👑💎🧠🚀", 
+            "¡EL LOBO DE WALL ST! 🎯💸⭐🔥"
+        ];
+
+        function handleKeyPress(e) { if (e.key === 'Enter') checkAnswer(); }
+
+        function startGame(selectedWorld) {
+            username = document.getElementById("username").value || "Candidato";
+            world = selectedWorld;
+            timerMax = (world === 1) ? 120 : (world === 2) ? 180 : 240;
+            
+            document.getElementById("setup-container").classList.add("hidden");
+            document.getElementById("game-container").classList.remove("hidden");
+            nextQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = timerMax;
+            document.getElementById("timer").innerText = timeLeft + "s";
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer").innerText = timeLeft + "s";
+                if (timeLeft <= 0) checkAnswer();
+            }, 1000);
+        }
+
+        function nextQuestion() {
+            questionsDone++;
+            if(questionsDone > totalQuestions) return endGame();
+
+            document.getElementById("progress").innerText = `P: ${questionsDone}/10`;
+            let capital = Math.floor(Math.random() * 9 + 1) * 1000;
+            let tasa = Math.floor(Math.random() * 10) + 1;
+            let tiempo = Math.floor(Math.random() * 5) + 2;
+
+            if (world === 1) {
+                let interes = capital * (tasa/100) * tiempo;
+                if(Math.random() > 0.5) {
+                    document.getElementById("problem-text").innerText = `SIMPLE: Capital ${capital}€, Tasa ${tasa}%, Tiempo ${tiempo} años. ¿CAPITAL FINAL (Cf)?`;
+                    currentAnswer = capital + interes;
+                } else {
+                    document.getElementById("problem-text").innerText = `SIMPLE: Capital ${capital}€, Tasa ${tasa}%, Tiempo ${tiempo} años. ¿INTERÉS (I)?`;
+                    currentAnswer = interes;
+                }
+            } else if (world === 2) {
+                document.getElementById("problem-text").innerText = `COMPUESTO: Capital ${capital}€, Tasa ${tasa}%, Tiempo ${tiempo} años. ¿VALOR FUTURO (Cf)?`;
+                currentAnswer = capital * Math.pow((1 + tasa/100), tiempo);
+            } else {
+                document.getElementById("problem-text").innerText = `INVERSA: Cf es ${capital}€ tras ${tiempo} años al ${tasa}%. ¿CAPITAL INICIAL (Ci)?`;
+                currentAnswer = capital / (1 + (tasa/100) * tiempo);
+            }
+
+            document.getElementById("answer").value = "";
+            document.getElementById("answer").disabled = false;
+            document.getElementById("send-btn").disabled = false;
+            document.getElementById("answer").focus();
+            startTimer();
+        }
+
+        function checkAnswer() {
+            clearInterval(timerInterval);
+            let userAnswer = parseFloat(document.getElementById("answer").value);
+            document.getElementById("answer").disabled = true;
+            document.getElementById("send-btn").disabled = true;
+
+            if (Math.abs(userAnswer - currentAnswer) < 1.5) {
+                score += Math.floor((timeLeft / timerMax) * 100);
+                document.getElementById("score-display").innerText = "$" + score;
+                document.getElementById("feedback").innerText = congrats[Math.floor(Math.random()*congrats.length)];
+                document.getElementById("main-container").classList.add("correct-anim");
+            } else {
+                document.getElementById("feedback").innerHTML = "<span class='text-rose-500'>ERROR DE BALANCE ❌</span>";
+            }
+
+            // PAUSA DE 2 SEGUNDOS IMPLEMENTADA
+            setTimeout(() => {
+                document.getElementById("main-container").classList.remove("correct-anim");
+                document.getElementById("feedback").innerText = "";
+                nextQuestion();
+            }, 2000);
+        }
+
+        function endGame() {
+            const isHired = score >= maxPoints * 0.6;
+            
+            // Imagen del niño genio para éxito / Imagen inspirada en "En busca de la felicidad" para fallo
+            const hiredImg = "https://openclipart.org/image/400px/275327"; // Ilustración de niño genio
+            const failedImg = "https://openclipart.org/image/400px/217316"; // Ilustración de persona esforzándose/triste
+
+            let msg = score >= maxPoints * 0.9 ? "💼 DIRECTOR FINTECH" : (isHired ? "✅ CONTRATADO" : "❌ SIGUE INTENTÁNDOLO");
+            let sub = isHired ? `¡Bienvenido al éxito, ${username}! 🥂` : `Momentos duros, ${username}. Como en la película: "No permitas que nadie te diga que no puedes hacer algo".`;
+
+            document.getElementById("main-container").innerHTML = `
+                <div class="fade-in">
+                    <img src="${isHired ? hiredImg : failedImg}" class="w-48 h-48 mx-auto rounded-full border-4 ${isHired ? 'border-emerald-500' : 'border-rose-500'} mb-6 object-cover shadow-2xl bg-slate-100">
+                    <h1 class="text-3xl font-black ${isHired ? 'text-emerald-600' : 'text-rose-600'}">${msg}</h1>
+                    <p class="text-slate-500 font-bold mb-6 px-2">${sub}</p>
+                    <div class="bg-slate-100 p-4 rounded-2xl mb-6 border-2 border-slate-200">
+                        <p class="text-xs text-slate-400 uppercase font-black tracking-widest">Puntuación de Rendimiento</p>
+                        <p class="text-6xl font-black text-slate-800">${score}</p>
+                    </div>
+                    <button onclick="location.reload()" class="w-full bg-indigo-600 text-white p-5 rounded-2xl font-black hover:bg-indigo-700 transition-all shadow-xl">Nueva Oportunidad</button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
