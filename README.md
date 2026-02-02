@@ -1,3 +1,8 @@
+
+# 🚀 ¡JUEGA AQUÍ! 
+👉 [Haga clic aquí para iniciar la Entrevista Finanzas Pro](https://ricardoposada1984.github.io/EdFintechgame/)
+
+
 # 🧠 SÚPER CEREBRO: Finanzas Pro 💼
 
 Bienvenido a **Súper Cerebro**, un simulador de entrevista técnica diseñado para evaluar y entrenar la agilidad mental en cálculos financieros de alto nivel. 
